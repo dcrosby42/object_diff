@@ -24,12 +24,12 @@ module Rdiff
   end
 
   class HashDiff < Diff
-    def initialize(a,b,diffs,added,lost)
+    attr_reader :diffs, :added, :removed
+    def initialize(a,b,diffs,added,removed)
       super a,b
       @diffs = diffs
       @added = added
-      @lost = lost
-      @changes = []
+      @removed = removed
     end
     def changes
       @changes
@@ -94,8 +94,16 @@ module Rdiff
       shared_keys = (Set.new(a_keys) & Set.new(b_keys)).to_a.sort
       # all_keys = Set.new(a_keys + b_keys).to_a.sort
 
-      adds = new_keys.map do |key| b[key] end
-      drops = missing_keys.map do |key| a[key] end
+      added = {}
+      new_keys.each do |k|
+        added[k] = b[k]
+      end
+
+      removed = {}
+      missing_keys.each do |k|
+        removed[k] = a[k]
+      end
+
       diffs = {}
       shared_keys.each do |key| 
         d = diff(a[key], b[key]) 
@@ -104,10 +112,10 @@ module Rdiff
         end
       end
 
-      if adds.empty? and drops.empty? and diffs.keys.empty?
+      if added.keys.empty? and removed.keys.empty? and diffs.keys.empty?
         nil
       else
-        make_hash_diff a,b, diffs, adds, drops
+        make_hash_diff a,b, diffs, added, removed
       end
     end
 
