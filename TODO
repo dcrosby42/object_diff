@@ -1,16 +1,17 @@
+Directly support Structs
+  Struct#members
+
 Arbitrary Object diffing strategies?
-  User-provided converter strategies
+  User-provided converter strategies?
   Default impl via "to_json" or somesuch?
 
-Refactor code internals to define HashDiff and ArrayDiff as strategies
 
-"Visitor" approach
+"Visitor" approach - pass blocks, decide how to proceed at each point of diff
+
+HashStrategy and ArrayStrategy directly invoke Difference.diff as their recursion strategy
+  Decouple? How?
 
 Alternate Array-diffing strategies?
   Added/Removed strategy
   
-
-Tests:
-  Express HashDiffs and ArrayDiffs via inline expressions
-
 
