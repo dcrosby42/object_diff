@@ -1,25 +1,35 @@
 require 'set'
 module Difference
-  class Diff
+
+  class Base
     attr_reader :a, :b
     def initialize(a,b)
       @a = a
       @b = b
     end
-    def changes
-      []
+
+    def base_equal(o)
+      o and o.class == self.class and a == o.a and b == o.b
     end
 
     def ==(o)
-      o and o.class == self.class and a == o.a and b == o.b
+      raise "equality via '==' not implemented for #{self.class.name}"
     end
+
     alias_method :eq, :==
 
     def to_s
       inspect
     end
+
     def inspect
-      "<#{a.inspect}->#{b.inspect}>"
+      "#{a.inspect}->#{b.inspect}"
+    end
+  end
+
+  class Diff < Base
+    def ==(o)
+      base_equal o
     end
   end
 
@@ -32,10 +42,30 @@ module Difference
       @removed = removed
     end
     def inspect
-      @diffs.inspect
+      kvs = ->((k,v)) { 
+        ks = if Symbol === k
+               k
+             else
+               k.inspect
+             end
+        "#{ks}: #{v.inspect}" 
+      }
+      hins = ->(h) { h.map(&kvs).join(", ") }
+      parts = []
+      if @diffs.keys.length > 0
+        parts << hins.call(@diffs)
+      end
+      if @added.keys.length > 0
+        parts << "(added #{hins.call(@added)})"
+      end
+      if @removed.keys.length > 0
+        parts << "(removed #{hins.call(@removed)})"
+      end
+      "{#{parts.join(' ')}}"
     end
+
     def ==(o)
-      super(o) and diffs == o.diffs and added == o.added and removed == o.removed
+      base_equal(o) and diffs == o.diffs and added == o.added and removed == o.removed
     end
   end
 
