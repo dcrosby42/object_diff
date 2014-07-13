@@ -9,29 +9,25 @@ require_relative 'difference/strategy/array_strategy'
 
 module Difference
   class << self
-    # def add_strategy(strategy)
-    #   strategies << strategy
-    # end
-
-    def strategies
+    def default_strategies
       @strategies ||= [
         Strategy::HashStrategy.new,
         Strategy::ArrayStrategy.new,
         Strategy::ScalarStrategy.new,
       ]
     end
-    
-    # def default_strategy
-    #   @default_strategy ||= Strategy::ScalarStrategy.new
-    # end
 
     def diff(a,b)
+      diff_with_strategies a,b, default_strategies
+    end
+    
+    def diff_with_strategies(a,b, strategies)
       strategies.each do |strategy|
         if strategy.applies_to(a,b)
           return strategy.execute(a,b)
         end
       end
-      raise "Couldn't find applicable strategy for #{a.inspect} #{b.inspect}"
+      raise "No Strategy found that applies to (#{a.inspect}, #{b.inspect}) amongst #{strategies.map do |s| s.class end.inspect}"
     end
 
   end

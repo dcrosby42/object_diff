@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe "Difference" do
+
   def diff(a,b)
     Difference.diff(a,b)
   end
