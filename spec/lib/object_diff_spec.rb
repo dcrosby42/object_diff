@@ -1,10 +1,21 @@
 require 'spec_helper'
-
+# require 'prettyprint'
 describe "ObjectSpec" do
 
   def diff(a,b)
-    ObjectDiff.diff(a,b)
+    result = ObjectDiff.diff(a,b)
+    print_demo(a,b,result) if ENV['demo'] == '1' || ENV['DEMO'] == '1'
+    result
   end
+
+  def print_demo(a,b,result)
+    str = ""
+    str << "        a = #{a.inspect}\n"
+    str << "        b = #{b.inspect}\n"
+    str << "        ObjectDiff.diff(a,b) => #{result.inspect}\n"
+    puts str
+  end
+
   def Diff(a,b)
     ObjectDiff::ScalarDiff.new(a,b)
   end
@@ -14,7 +25,7 @@ describe "ObjectSpec" do
   def ArrayDiff(a,b,diffs)
     ObjectDiff::ArrayDiff.new(a,b,diffs)
   end
-  
+
   describe "base case:" do
     it "nils are same" do
       expect(diff(nil,nil)).to be nil
