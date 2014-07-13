@@ -1,7 +1,7 @@
 require 'set'
 module Difference
 
-  class HashDiff < Diff
+  class HashDiff < Base
     attr_reader :diffs, :added, :removed
 
     def initialize(a,b,diffs,added,removed)

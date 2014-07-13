@@ -1,6 +1,7 @@
 module Difference
   class Base
     attr_reader :a, :b
+
     def initialize(a,b)
       @a = a
       @b = b
@@ -18,10 +19,6 @@ module Difference
 
     def to_s
       inspect
-    end
-
-    def inspect
-      "#{a.inspect}->#{b.inspect}"
     end
   end
 end

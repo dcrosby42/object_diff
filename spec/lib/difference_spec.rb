@@ -5,7 +5,7 @@ describe "Difference" do
     Difference.diff(a,b)
   end
   def Diff(a,b)
-    Difference::Diff.new(a,b)
+    Difference::ScalarDiff.new(a,b)
   end
   def HashDiff(a,b,diffs,added={},removed={})
     Difference::HashDiff.new(a,b,diffs,added,removed)

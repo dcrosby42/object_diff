@@ -1,5 +1,5 @@
 module Difference
-  class ArrayDiff < Diff
+  class ArrayDiff < Base
     attr_reader :diffs
     def initialize(a,b,diffs)
       super a,b
@@ -11,8 +11,9 @@ module Difference
       end.join(", ")
       "[#{s}]"
     end
+
     def ==(o)
-      super(o) and diffs == o.diffs
+      base_equal(o) and diffs == o.diffs
     end
   end
 end
