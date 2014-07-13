@@ -1,93 +1,5 @@
-require 'set'
 module Difference
-
-  class Base
-    attr_reader :a, :b
-    def initialize(a,b)
-      @a = a
-      @b = b
-    end
-
-    def base_equal(o)
-      o and o.class == self.class and a == o.a and b == o.b
-    end
-
-    def ==(o)
-      raise "equality via '==' not implemented for #{self.class.name}"
-    end
-
-    alias_method :eq, :==
-
-    def to_s
-      inspect
-    end
-
-    def inspect
-      "#{a.inspect}->#{b.inspect}"
-    end
-  end
-
-  class Diff < Base
-    def ==(o)
-      base_equal o
-    end
-  end
-
-  class HashDiff < Diff
-    attr_reader :diffs, :added, :removed
-    def initialize(a,b,diffs,added,removed)
-      super a,b
-      @diffs = diffs
-      @added = added
-      @removed = removed
-    end
-    def inspect
-      kvs = ->((k,v)) { 
-        ks = if Symbol === k
-               k
-             else
-               k.inspect
-             end
-        "#{ks}: #{v.inspect}" 
-      }
-      hins = ->(h) { h.map(&kvs).join(", ") }
-      parts = []
-      if @diffs.keys.length > 0
-        parts << hins.call(@diffs)
-      end
-      if @added.keys.length > 0
-        parts << "(added #{hins.call(@added)})"
-      end
-      if @removed.keys.length > 0
-        parts << "(removed #{hins.call(@removed)})"
-      end
-      "{#{parts.join(' ')}}"
-    end
-
-    def ==(o)
-      base_equal(o) and diffs == o.diffs and added == o.added and removed == o.removed
-    end
-  end
-
-  class ArrayDiff < Diff
-    attr_reader :diffs
-    def initialize(a,b,diffs)
-      super a,b
-      @diffs = diffs
-    end
-    def inspect
-      s = @diffs.map do |i,d|
-        "#{i}: #{d}"
-      end.join(", ")
-      "[#{s}]"
-    end
-    def ==(o)
-      super(o) and diffs == o.diffs
-    end
-  end
-
   class << self
-
     def diff(a,b)
       if Hash === a and Hash === b
         diff_hash(a, b)
@@ -126,7 +38,6 @@ module Difference
       new_keys = b_keys - a_keys
       missing_keys = a_keys - b_keys
       shared_keys = (Set.new(a_keys) & Set.new(b_keys)).to_a.sort
-      # all_keys = Set.new(a_keys + b_keys).to_a.sort
 
       added = {}
       new_keys.each do |k|
@@ -175,3 +86,8 @@ module Difference
     end
   end
 end
+
+require_relative 'difference/base'
+require_relative 'difference/diff'
+require_relative 'difference/hash_diff'
+require_relative 'difference/array_diff'
