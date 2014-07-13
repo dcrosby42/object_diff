@@ -1,0 +1,16 @@
+Arbitrary Object diffing strategies?
+  User-provided converter strategies
+  Default impl via "to_json" or somesuch?
+
+Refactor code internals to define HashDiff and ArrayDiff as strategies
+
+"Visitor" approach
+
+Alternate Array-diffing strategies?
+  Added/Removed strategy
+  
+
+Tests:
+  Express HashDiffs and ArrayDiffs via inline expressions
+
+

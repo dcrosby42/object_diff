@@ -7,6 +7,12 @@ describe "rdiff" do
   def Diff(a,b)
     Rdiff::Diff.new(a,b)
   end
+  def HashDiff(a,b,diffs,added={},removed={})
+    Rdiff::HashDiff.new(a,b,diffs,added,removed)
+  end
+  def ArrayDiff(a,b,diffs)
+    Rdiff::ArrayDiff.new(a,b,diffs)
+  end
   
   describe "base case:" do
     it "nils are same" do
@@ -49,33 +55,21 @@ describe "rdiff" do
       left = {a:"A1"}
       right = {a:"A2"}
       d = diff(left,right)
-      expect(d.a).to be(left)
-      expect(d.b).to be(right)
-      expect(d.diffs).to eq({a: Diff('A1', 'A2') })
-      expect(d.added).to eq({})
-      expect(d.removed).to eq({})
+      expect(d).to eq HashDiff(left,right,{a:Diff('A1','A2')})
     end
 
     it "finds new pairs" do
       left = {a:"A1"}
       right = {a:"A1", b:"B1", c:"C1"}
       d = diff(left,right)
-      expect(d.a).to be(left)
-      expect(d.b).to be(right)
-      expect(d.diffs).to eq({})
-      expect(d.added).to eq(b:'B1',c:"C1")
-      expect(d.removed).to eq({})
+      expect(d).to eq HashDiff(left,right,{}, {b:'B1',c:'C1'})
     end
 
     it "finds missing pairs" do
       left = {a:"A1", b:"B1", c:"C1"}
       right = {a:"A1"}
       d = diff(left,right)
-      expect(d.a).to be(left)
-      expect(d.b).to be(right)
-      expect(d.diffs).to eq({})
-      expect(d.added).to eq({})
-      expect(d.removed).to eq(b:'B1',c:"C1")
+      expect(d).to eq HashDiff(left,right,{},{}, {b:'B1',c:'C1'})
     end
 
     it "can handle all three cases at once" do
@@ -84,27 +78,23 @@ describe "rdiff" do
       d = diff(left,right)
       expect(d.a).to be(left)
       expect(d.b).to be(right)
-      expect(d.diffs).to eq({a: Diff('A1','A2')})
-      expect(d.added).to eq({c: "C1"})
-      expect(d.removed).to eq(b:'B1')
+      expect(d).to eq HashDiff(left,right,
+                               {a:Diff('A1','A2')},
+                               {c:'C1'}, 
+                               {b:'B1'})
     end
 
     it "can handle Hashes in Hashes" do
       left = {h: {a: 'A1', b:'B1', k:'K'}, x:'X', z:'Z'}
       right = {h: {a: 'A2', c:'C1', k:'K'}, y:'Y', z:'Z'}
       d = diff(left,right)
-      expect(d.a).to be(left)
-      expect(d.b).to be(right)
-
-      hd = d.diffs[:h]
-      expect(hd.a).to be(left[:h])
-      expect(hd.b).to be(right[:h])
-      expect(hd.diffs).to eq({a: Diff('A1','A2')})
-      expect(hd.added).to eq({c:"C1"})
-      expect(hd.removed).to eq(b:'B1')
-      
-      expect(d.added).to eq(y: 'Y')
-      expect(d.removed).to eq(x: 'X')
+      expect(d).to eq HashDiff(left,right,
+                               {h: HashDiff(left[:h], right[:h],
+                                            {a: Diff('A1','A2')},
+                                            {c:'C1'}, 
+                                            {b:'B1'})},
+                               {y: 'Y'},
+                               {x: 'X'})
     end
   end
 
@@ -125,8 +115,54 @@ describe "rdiff" do
       expect(diff(a,b)).to be nil
     end
 
-    it 'walks through the arrays side-by-side to discover diffs'
-    it 'works when a is longer than b'
-    it 'works when a is shorter than b'
+    context 'same-length arrays w some diffing elements' do
+      it 'works on one element' do
+        a = ['A']
+        b = ['B']
+        expect(diff(a,b)).to eq ArrayDiff(a,b, 0 => Diff('A','B'))
+      end
+
+      it 'includes only the differing elements, keyed by their index' do
+        a = [1,4,7]
+        b = [1,2,3]
+        expect(diff(a,b)).to eq ArrayDiff(a,b, 1 => Diff(4,2), 2 => Diff(7,3))
+      end
+    end
+
+    context 'when a is longer than b' do
+      it "creates x-to-nil diffs" do
+        a = [1,2,3]
+        b = [1,3]
+        expect(diff(a,b)).to eq ArrayDiff(a,b, 1 => Diff(2,3), 2 => Diff(3,nil))
+      end
+    end
+
+    context 'when a is shorter than b' do
+      it "creates nil-to-x diffs" do
+        a = [1,3]
+        b = [1,2,3]
+        expect(diff(a,b)).to eq ArrayDiff(a,b, 1 => Diff(3,2), 2 => Diff(nil,3))
+      end
+    end
+
+    it 'can diff nested Hashes' do 
+      a = [{a:'A', b:'B'}]
+      b = [{a:'A', b:'Bee'}, {c:'C'}]
+      expect(diff(a,b)).to eq ArrayDiff(a,b, 
+                                        0 => HashDiff(a[0],b[0],
+                                                      {b: Diff('B','Bee')}),
+                                        1 => Diff(nil, {c:'C'}))
+    end
+
+    it 'can diff nested arrays' do
+      a = [[1,2], [3,[4,5], [5.5]], [6]]
+      b = [[1,2], [33,[44,5], [5.5]]]
+      expect(diff(a,b)).to eq ArrayDiff(a,b,
+                                        1 => ArrayDiff(a[1],b[1],
+                                                       0 => Diff(3,33),
+                                                       1 => ArrayDiff(a[1][1],b[1][1],
+                                                                      0 => Diff(4,44))),
+                                        2 => Diff([6], nil))
+    end
   end
 end

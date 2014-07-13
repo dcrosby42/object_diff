@@ -31,24 +31,28 @@ module Rdiff
       @added = added
       @removed = removed
     end
-    def changes
-      @changes
-    end
-
     def inspect
       @diffs.inspect
+    end
+    def ==(o)
+      super(o) and diffs == o.diffs and added == o.added and removed == o.removed
     end
   end
 
   class ArrayDiff < Diff
-    def initialize(a,b,adds,drops)
+    attr_reader :diffs
+    def initialize(a,b,diffs)
       super a,b
-      @adds = adds
-      @drops = drops
-      @changes = []
+      @diffs = diffs
     end
-    def changes
-      @changes
+    def inspect
+      s = @diffs.map do |i,d|
+        "#{i}: #{d}"
+      end.join(", ")
+      "[#{s}]"
+    end
+    def ==(o)
+      super(o) and diffs == o.diffs
     end
   end
 
@@ -74,8 +78,8 @@ module Rdiff
       HashDiff.new(a,b,diffs,adds,drops)
     end
 
-    def make_array_diff(a,b,adds,drops)
-      ArrayDiff.new(a,b,adds,drops)
+    def make_array_diff(a,b,diffs)
+      ArrayDiff.new(a,b,diffs)
     end
 
     def diff_scalar_value(a,b)
@@ -119,13 +123,24 @@ module Rdiff
       end
     end
 
-    def diff_array(a,b)
-      new_items = b - a
-      missing_items = a - b
-      if new_items.empty? and missing_items.empty?  
+    def diff_array(a_arr,b_arr)
+      left = a_arr.clone
+      short = b_arr.length - left.length
+      if short > 0
+        left += [nil]*3
+      end
+
+      diffs = {}
+      left.zip(b_arr).each.with_index do |(a,b),i|
+        if d = diff(a,b)
+          diffs[i] = d
+        end
+      end
+      diffs
+      if diffs.keys.empty?
         nil
       else
-        make_array_diff a,b, new_items, missing_items
+        make_array_diff(a_arr, b_arr, diffs)
       end
     end
   end
