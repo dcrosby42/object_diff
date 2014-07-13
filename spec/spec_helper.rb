@@ -4,5 +4,5 @@ $LOAD_PATH << "#{PROJ_ROOT}/lib"
 require 'bundler'
 Bundler.setup
 
-require 'difference'
+require 'object_diff'
 

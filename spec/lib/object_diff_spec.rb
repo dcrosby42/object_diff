@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe "Difference" do
+describe "ObjectSpec" do
 
   def diff(a,b)
-    Difference.diff(a,b)
+    ObjectDiff.diff(a,b)
   end
   def Diff(a,b)
-    Difference::ScalarDiff.new(a,b)
+    ObjectDiff::ScalarDiff.new(a,b)
   end
   def HashDiff(a,b,diffs,added={},removed={})
-    Difference::HashDiff.new(a,b,diffs,added,removed)
+    ObjectDiff::HashDiff.new(a,b,diffs,added,removed)
   end
   def ArrayDiff(a,b,diffs)
-    Difference::ArrayDiff.new(a,b,diffs)
+    ObjectDiff::ArrayDiff.new(a,b,diffs)
   end
   
   describe "base case:" do

@@ -1,4 +1,4 @@
-module Difference
+module ObjectDiff
   module Strategy
     class ArrayStrategy
 
@@ -15,7 +15,7 @@ module Difference
 
         diffs = {}
         left.zip(b_arr).each.with_index do |(a,b),i|
-          if d = Difference.diff(a,b)
+          if d = ObjectDiff.diff(a,b)
             diffs[i] = d
           end
         end

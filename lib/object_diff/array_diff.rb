@@ -1,4 +1,4 @@
-module Difference
+module ObjectDiff
   class ArrayDiff < Base
     attr_reader :diffs
     def initialize(a,b,diffs)

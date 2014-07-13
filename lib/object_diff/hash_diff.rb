@@ -1,5 +1,5 @@
 require 'set'
-module Difference
+module ObjectDiff
 
   class HashDiff < Base
     attr_reader :diffs, :added, :removed

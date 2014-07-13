@@ -1,4 +1,4 @@
-module Difference
+module ObjectDiff
   class Base
     attr_reader :a, :b
 

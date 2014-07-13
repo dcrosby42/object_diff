@@ -1,3 +1,3 @@
-module Difference
+module ObjectDiff
   VERSION = "0.0.1"
 end

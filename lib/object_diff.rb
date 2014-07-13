@@ -1,13 +1,13 @@
-require_relative 'difference/base'
-require_relative 'difference/scalar_diff'
-require_relative 'difference/hash_diff'
-require_relative 'difference/array_diff'
+require_relative 'object_diff/base'
+require_relative 'object_diff/scalar_diff'
+require_relative 'object_diff/hash_diff'
+require_relative 'object_diff/array_diff'
 
-require_relative 'difference/strategy/scalar_strategy'
-require_relative 'difference/strategy/hash_strategy'
-require_relative 'difference/strategy/array_strategy'
+require_relative 'object_diff/strategy/scalar_strategy'
+require_relative 'object_diff/strategy/hash_strategy'
+require_relative 'object_diff/strategy/array_strategy'
 
-module Difference
+module ObjectDiff
   class << self
     def default_strategies
       @strategies ||= [

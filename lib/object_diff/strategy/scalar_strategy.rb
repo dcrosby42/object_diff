@@ -1,4 +1,4 @@
-module Difference
+module ObjectDiff
   module Strategy
     class ScalarStrategy
       def applies_to(a,b)

@@ -1,4 +1,4 @@
-module Difference
+module ObjectDiff
   module Strategy
     class HashStrategy 
 
@@ -25,7 +25,7 @@ module Difference
 
         diffs = {}
         shared_keys.each do |key| 
-          d = Difference.diff(a[key], b[key]) 
+          d = ObjectDiff.diff(a[key], b[key]) 
           if d
             diffs[key] = d
           end

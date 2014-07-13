@@ -1,4 +1,4 @@
-module Difference
+module ObjectDiff
   class ScalarDiff < Base
     def ==(o)
       base_equal o
