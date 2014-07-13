@@ -1,5 +1,5 @@
 require 'set'
-module Rdiff
+module Difference
   class Diff
     attr_reader :a, :b
     def initialize(a,b)

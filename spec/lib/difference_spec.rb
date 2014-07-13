@@ -1,17 +1,17 @@
 require 'spec_helper'
 
-describe "rdiff" do
+describe "Difference" do
   def diff(a,b)
-    Rdiff.diff(a,b)
+    Difference.diff(a,b)
   end
   def Diff(a,b)
-    Rdiff::Diff.new(a,b)
+    Difference::Diff.new(a,b)
   end
   def HashDiff(a,b,diffs,added={},removed={})
-    Rdiff::HashDiff.new(a,b,diffs,added,removed)
+    Difference::HashDiff.new(a,b,diffs,added,removed)
   end
   def ArrayDiff(a,b,diffs)
-    Rdiff::ArrayDiff.new(a,b,diffs)
+    Difference::ArrayDiff.new(a,b,diffs)
   end
   
   describe "base case:" do
